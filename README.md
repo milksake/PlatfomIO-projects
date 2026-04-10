@@ -1,8 +1,5 @@
 # Custom Clock ESP32 
 
-¡Hola! Este es el código de mi proyecto **Custom Clock**, un reloj inteligente hecho con un ESP32. Está armado por módulos para que sea más fácil de entender y manejar: tiene una parte para el sonido, otra para los motores (paso a paso y servos), lectura de teclado y hasta conexión WiFi.
-
-
 - **Sonido**: (formato RTTTL) usando el DAC que ya trae el ESP32 adentro, gracias a la librería `ESP8266Audio`.
 - **WiFi**: Funciona como cliente y servidor para controlarlo por internet.
 - **Movimiento y control**: Mueve motores para las manecillas o funciones físicas y lee lo que tocas en un teclado matricial.
