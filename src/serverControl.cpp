@@ -18,31 +18,40 @@ typedef struct {
 
 Mensaje mensaje;
 
-int posicionActual = 0;
+volatile int posicionActual = 0;
+volatile int pending = 0;
 
-void moverA(int angulo)
+void moverA2(int pasosDestino)
 {
-  int pasosDestino = (angulo * stepsPerRevolution) / 360;
-  int pasosActual = (posicionActual * stepsPerRevolution) / 360;
+  int pasosActual = posicionActual;
 
   int pasosMover = pasosDestino - pasosActual;
+  
+  Serial.print("\tSteps: ");
+  Serial.println(pasosMover);
 
-  myStepper.step(pasosMover);
+  if (pasosMover >= 0)
+    myStepper.step(pasosMover);
+  else
+  {
+    myStepper.step(pasosMover - 300);
+    myStepper.step(300);
+  }
 
-  posicionActual = angulo;
+  posicionActual = pasosDestino;
 }
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+
+  if (pending)
+    return;
 
   memcpy(&mensaje, incomingData, sizeof(mensaje));
 
   Serial.print("Boton recibido: ");
   Serial.println(mensaje.boton);
 
-  if (mensaje.boton == 1) moverA(0);
-  if (mensaje.boton == 2) moverA(90);
-  if (mensaje.boton == 3) moverA(180);
-  if (mensaje.boton == 4) moverA(270);
+  pending = mensaje.boton;
 }
 
 void setup() {
@@ -62,5 +71,17 @@ void setup() {
 }
 
 void loop() {
+  if (pending)
+  {
+    // 2796 - 1398 - 233
 
+    if (pending == 1) moverA2(0);        // 01:15
+    if (pending == 2) moverA2(233 * 3);  // 01:00
+    if (pending == 3) moverA2(233 * 5);  // 12:50
+    if (pending == 4) moverA2(233 * 6);  // 12:45
+    
+    // if (pending == 4) myStepper.step(10);
+
+    pending = 0;
+  }
 }
